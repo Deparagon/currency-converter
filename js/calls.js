@@ -11,6 +11,19 @@ const getData =function(url) {
   return fetch(url)
   .then(response => response.json()) 
 }
+const roundAmount = (n)=>parseFloat(n).toFixed(2);
+
+const storeCur = function(data, key){
+let DBOpenRequest = indexedDB.open("CurConverterDb", 1);
+DBOpenRequest.onsuccess = function(event) {
+db = DBOpenRequest.result;
+let tx = db.transaction("curPair", "readwrite");
+let store = tx.objectStore("curPair");
+store.put(data, key)
+tx.oncomplete = function() {
+}; 
+}
+}
 
 const listenNcall =function(){
   if(listTo.value.length >0){
@@ -23,18 +36,17 @@ const listenNcall =function(){
 function convertCurrency(amount, fromCurrency, toCurrency) {
   fromCurrency = encodeURIComponent(fromCurrency);
   toCurrency = encodeURIComponent(toCurrency);
-  let query = fromCurrency + '_' + toCurrency;
+  let query = `${fromCurrency}_${toCurrency}`;
   let url = `${conUrl}?q=${query}&compact=ultra`;
 
   let request = getData(url);
       request.then(function(response){
-        console.log(response);
-        const{query} = response;
-        console.log(query);
-  let converted= parseFloat(amount*(response[Object.keys(response)[0]]));
+       storeCur(response, query);
+        
+  let converted= parseFloat(amount*(response[Object.keys(response)[0]])).toFixed(2);
     cTo.value = converted;
 
-    reportDiv.innerHTML = `${amount} ${fromCurrency} equals ${converted} ${toCurrency}`;
+    reportDiv.innerHTML = `<p class="result-f">${roundAmount(amount)} ${listFrom.options[listFrom.selectedIndex].text} equals <span class="result-t"> ${converted} ${listTo.options[listTo.selectedIndex].text} </p>`;
     
       })   
 }
@@ -46,7 +58,7 @@ window.addEventListener('load',function(){
     let currencies = response.results;
     let options = '';
      for (const cur in currencies ){
-      options+=`<option value="${cur}">${currencies[cur].currencyName} |${currencies[cur].currencySymbol} </option>`;  
+      options+=`<option value="${cur}">${currencies[cur].currencyName}</option>`;  
      }
      listTo.innerHTML =options;
      listFrom.innerHTML= options;

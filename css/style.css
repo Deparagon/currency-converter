@@ -11,3 +11,16 @@
 	text-align: center;
 	padding:15px;
 }
+
+.result-f{
+  text-align: center;
+  padding: 10px;
+}
+
+.result-t{
+	font-weight: bolder;
+
+}
+footer p {
+	text-align: center;
+}
