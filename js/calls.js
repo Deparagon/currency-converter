@@ -63,7 +63,7 @@ function convertCurrency(amount, fromCurrency, toCurrency) {
     let convertedValues = objectStoreRequest.result;
      
      if(convertedValues){
-       console.log(convertedValues);
+     //  console.log(convertedValues);
         let converted= parseFloat(amount*(convertedValues[Object.keys(convertedValues)[0]])).toFixed(2);
         cTo.value = converted;
         reportDiv.innerHTML = `<p class="result-f">${roundAmount(amount)} ${listFrom.options[listFrom.selectedIndex].text} equals <span class="result-t"> ${converted} ${listTo.options[listTo.selectedIndex].text} </p>`;
