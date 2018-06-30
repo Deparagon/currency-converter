@@ -33,23 +33,48 @@ const listenNcall =function(){
        }
 }
 
+const runLiveConversion = function(url, query, amount)
+{
+     let request = getData(url);
+      request.then(function(response){
+      storeCur(response, query);  
+    let converted= parseFloat(amount*(response[Object.keys(response)[0]])).toFixed(2);
+    cTo.value = converted;
+    reportDiv.innerHTML = `<p class="result-f">${roundAmount(amount)} ${listFrom.options[listFrom.selectedIndex].text} equals <span class="result-t"> ${converted} ${listTo.options[listTo.selectedIndex].text} </p>`;
+    
+      }) 
+}
+
+
 function convertCurrency(amount, fromCurrency, toCurrency) {
   fromCurrency = encodeURIComponent(fromCurrency);
   toCurrency = encodeURIComponent(toCurrency);
   let query = `${fromCurrency}_${toCurrency}`;
   let url = `${conUrl}?q=${query}&compact=ultra`;
 
-  let request = getData(url);
-      request.then(function(response){
-       storeCur(response, query);
-        
-  let converted= parseFloat(amount*(response[Object.keys(response)[0]])).toFixed(2);
-    cTo.value = converted;
 
-    reportDiv.innerHTML = `<p class="result-f">${roundAmount(amount)} ${listFrom.options[listFrom.selectedIndex].text} equals <span class="result-t"> ${converted} ${listTo.options[listTo.selectedIndex].text} </p>`;
-    
-      })   
-}
+    let DBOpenRequest = indexedDB.open("CurConverterDb", 1);
+    DBOpenRequest.onsuccess = function(e) {
+    db = DBOpenRequest.result;
+    let transaction = db.transaction("curPair", "readwrite");
+    let objectStore = transaction.objectStore("curPair");
+    let objectStoreRequest = objectStore.get(query);
+    objectStoreRequest.onsuccess = function(e) {
+    let convertedValues = objectStoreRequest.result;
+     
+     if(convertedValues){
+       console.log(convertedValues);
+        let converted= parseFloat(amount*(convertedValues[Object.keys(convertedValues)[0]])).toFixed(2);
+        cTo.value = converted;
+        reportDiv.innerHTML = `<p class="result-f">${roundAmount(amount)} ${listFrom.options[listFrom.selectedIndex].text} equals <span class="result-t"> ${converted} ${listTo.options[listTo.selectedIndex].text} </p>`;
+      return true;
+     }
+   
+     }
+     }
+
+    runLiveConversion(url, query, amount); 
+  }
 
 // events
 window.addEventListener('load',function(){

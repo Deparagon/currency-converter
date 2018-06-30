@@ -1,6 +1,6 @@
 const convertUrl = 'https://free.currencyconverterapi.com/api/v5/convert';
-const baseContentCache = 'converter-base-v1';
-const currenciesCache = 'converter-currencies-v1';
+const baseContentCache = 'converter-base-v2';
+const currenciesCache = 'converter-currencies-v2';
 conCaches =[
 baseContentCache,
 currenciesCache,
@@ -80,26 +80,8 @@ self.addEventListener('fetch', function(event) {
   
    let arurl = event.request.url.split('?');
    if(arurl[0] == convertUrl){
-    
-    let q = getParamName('q', arurl[1]);
-    let DBOpenRequest = indexedDB.open("CurConverterDb", 1);
-    DBOpenRequest.onsuccess = function(e) {
-    db = DBOpenRequest.result;
-    let transaction = db.transaction("curPair", "readwrite");
-    let objectStore = transaction.objectStore("curPair");
-    let objectStoreRequest = objectStore.get(q);
-    objectStoreRequest.onsuccess = function(e) {
-    let convertedValues = objectStoreRequest.result;
-    
-     if(convertedValues){
-      console.log(convertedValues);
-            return new Response(objectStoreRequest.result);
-     }
-   }
- }
       event.respondWith(
          fetch(event.request).then(function(response){
-           // console.log(response);
             return response;
           })
          )
