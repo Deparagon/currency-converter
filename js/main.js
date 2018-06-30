@@ -3,7 +3,7 @@ if(navigator.serviceWorker.register('sw.js' )){
 }
 } 
 else{
-	console.log('no service worker support');
+	console.log('No service worker support');
 }
 
 
